@@ -22,11 +22,13 @@ class _HomePageState extends State<HomePage> {
             if (snapshot.hasData) {
               var data = json.decode(snapshot.data.toString());
               List<Map> swiper = (data['data']['slides'] as List).cast();
+              List<Map> navigatorList = (data['data']['category'] as List).cast();
               return Column(
                 children: [
                   SwiperDiy(
                     swiperDataList: swiper,
-                  )
+                  ),
+                  TopNavigator(navigatorList: navigatorList,)
                 ],
               );
             } else {
@@ -66,6 +68,49 @@ class SwiperDiy extends StatelessWidget {
         },
         pagination: SwiperPagination(),
         autoplay: true,
+      ),
+    );
+  }
+}
+
+class TopNavigator extends StatelessWidget {
+  final List navigatorList;
+
+  TopNavigator({Key key, this.navigatorList}):
+  super(key: key);
+
+  Widget _gridViewItemUI(BuildContext context, item) {
+    return InkWell(
+      onTap: () {
+        print('点击了导航');
+      },
+      child: Column(
+        children: [
+          Image.network(
+            item['image'],
+            width: 95.w,
+          ),
+          Text(item['mallCategoryName'])
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(navigatorList.length > 10){
+      navigatorList.removeRange(10,navigatorList.length,);
+    }
+
+    return Container(
+      height: 340.h,
+      padding: EdgeInsets.all(3),
+      child: GridView.count(
+        crossAxisCount: 5,
+        padding: EdgeInsets.all(5),
+        children: navigatorList.map((item) {
+          return _gridViewItemUI(context, item);
+        }).toList(),
       ),
     );
   }

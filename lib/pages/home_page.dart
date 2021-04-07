@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/service/service_method.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,15 +21,24 @@ class _HomePageState extends State<HomePage> {
           future: getHomePageContent(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              var data = json.decode(snapshot.data.toString());
-              List<Map> swiper = (data['data']['slides'] as List).cast();
-              List<Map> navigatorList = (data['data']['category'] as List).cast();
+              var jsonData = json.decode(snapshot.data.toString());
+              var data = jsonData['data'];
+              List<Map> swiper = (data['slides'] as List).cast();
+              List<Map> navigatorList = (data['category'] as List).cast();
+              String adPicture = data['advertesPicture']['PICTURE_ADDRESS'];
+              String leaderPhone = data['shopInfo']['leaderPhone'];
+              String leaderImage = data['shopInfo']['leaderImage'];
+
               return Column(
                 children: [
                   SwiperDiy(
                     swiperDataList: swiper,
                   ),
-                  TopNavigator(navigatorList: navigatorList,)
+                  TopNavigator(
+                    navigatorList: navigatorList,
+                  ),
+                  AdBanner(adPicture),
+                  LeaderPhone(leaderImage, leaderPhone)
                 ],
               );
             } else {
@@ -48,13 +58,11 @@ class SwiperDiy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'widht = ${MediaQuery.of(context).size.width} height = ${MediaQuery.of(context).size.height}');
-    ScreenUtil.init(
-        BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width,
-            maxHeight: MediaQuery.of(context).size.height),
-        designSize: Size(750, 1334));
+    // ScreenUtil.init(
+    //     BoxConstraints(
+    //         maxWidth: MediaQuery.of(context).size.width,
+    //         maxHeight: MediaQuery.of(context).size.height),
+    //     designSize: Size(750, 1334));
     return Container(
       height: 333.h,
       width: 750.w,
@@ -76,8 +84,7 @@ class SwiperDiy extends StatelessWidget {
 class TopNavigator extends StatelessWidget {
   final List navigatorList;
 
-  TopNavigator({Key key, this.navigatorList}):
-  super(key: key);
+  TopNavigator({Key key, this.navigatorList}) : super(key: key);
 
   Widget _gridViewItemUI(BuildContext context, item) {
     return InkWell(
@@ -98,8 +105,11 @@ class TopNavigator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(navigatorList.length > 10){
-      navigatorList.removeRange(10,navigatorList.length,);
+    if (navigatorList.length > 10) {
+      navigatorList.removeRange(
+        10,
+        navigatorList.length,
+      );
     }
 
     return Container(
@@ -113,5 +123,44 @@ class TopNavigator extends StatelessWidget {
         }).toList(),
       ),
     );
+  }
+}
+
+class AdBanner extends StatelessWidget {
+  final String adPicture;
+
+  AdBanner(this.adPicture, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Image.network(adPicture),
+    );
+  }
+}
+
+class LeaderPhone extends StatelessWidget {
+  final String leaderPhone;
+  final String leaderImage;
+
+  LeaderPhone(this.leaderImage, this.leaderPhone, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: InkWell(
+        onTap: _launchUrl,
+        child: Image.network(leaderImage),
+      ),
+    );
+  }
+
+  void _launchUrl() async {
+    String url = 'tel:$leaderPhone';
+    if (await canLaunch(url)) {
+      await launch(url);
+    }else{
+      throw 'url 不能进行访问异常';
+    }
   }
 }

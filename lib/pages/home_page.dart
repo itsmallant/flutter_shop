@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/service/service_method.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +11,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,18 +29,22 @@ class _HomePageState extends State<HomePage> {
               String adPicture = data['advertesPicture']['PICTURE_ADDRESS'];
               String leaderPhone = data['shopInfo']['leaderPhone'];
               String leaderImage = data['shopInfo']['leaderImage'];
+              List<Map> recommendList = (data['recommend'] as List).cast();
 
-              return Column(
-                children: [
-                  SwiperDiy(
-                    swiperDataList: swiper,
-                  ),
-                  TopNavigator(
-                    navigatorList: navigatorList,
-                  ),
-                  AdBanner(adPicture),
-                  LeaderPhone(leaderImage, leaderPhone)
-                ],
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SwiperDiy(
+                      swiperDataList: swiper,
+                    ),
+                    TopNavigator(
+                      navigatorList: navigatorList,
+                    ),
+                    AdBanner(adPicture),
+                    LeaderPhone(leaderImage, leaderPhone),
+                    Recommend(recommendList)
+                  ],
+                ),
               );
             } else {
               return Center(
@@ -49,6 +54,9 @@ class _HomePageState extends State<HomePage> {
           }),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class SwiperDiy extends StatelessWidget {
@@ -159,8 +167,77 @@ class LeaderPhone extends StatelessWidget {
     String url = 'tel:$leaderPhone';
     if (await canLaunch(url)) {
       await launch(url);
-    }else{
+    } else {
       throw 'url 不能进行访问异常';
     }
+  }
+}
+
+class Recommend extends StatelessWidget {
+  final List _recommendList;
+
+  Recommend(this._recommendList, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 380.h,
+      margin: EdgeInsets.only(top: 10),
+      child: Column(
+        children: [_titleWidget(), _recommendListView()],
+      ),
+    );
+  }
+
+  Widget _titleWidget() {
+    return Container(
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(bottom: BorderSide(color: Colors.black12))),
+      padding: EdgeInsets.fromLTRB(10, 2, 0, 5),
+      child: Text(
+        '商品推荐',
+        style: TextStyle(color: Colors.pink),
+      ),
+    );
+  }
+
+  Widget _item(index) {
+    return InkWell(
+      onTap: () {},
+      child: Container(
+        height: 330.w,
+        width: 250.h,
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(right: BorderSide(color: Colors.black12))),
+        child: Column(
+          children: [
+            Image.network(_recommendList[index]['image']),
+            Text('￥${_recommendList[index]['mallPrice']}'),
+            Text(
+              '￥${_recommendList[index]['price']}',
+              style: TextStyle(
+                  decoration: TextDecoration.lineThrough, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _recommendListView() {
+    return Container(
+      height: 330.h,
+      child: ListView.builder(
+        itemCount: _recommendList.length,
+        itemBuilder: (context, index) {
+          return _item(index);
+        },
+        scrollDirection: Axis.horizontal,
+      ),
+    );
   }
 }

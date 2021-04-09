@@ -2,15 +2,13 @@ import '../config/service_url.dart';
 
 import 'package:dio/dio.dart';
 
-Future getHomePageContent() async {
+Future request(String urlName,var formData)async{
   try {
-    print('开始请求首页数据');
+    print('开始请求数据');
     Dio dio = Dio();
     dio.options.contentType = 'application/x-www-form-urlencoded';
-
-    var formData = {'lon': 116.44355, 'lat': 39.9219};
     Response response =
-        await dio.post(servicePath['homePageContent'], data: formData);
+        await dio.post(servicePath[urlName], data: formData);
     if (response.statusCode == 200) {
       return response.data;
     } else {

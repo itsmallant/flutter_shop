@@ -11,15 +11,26 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
+  int page = 1;
+  List<Map> hotGoodsList = [];
+
+  @override
+  void initState() {
+    _fetchHostGoodsList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    var formData = {'lon': 116.44355, 'lat': 39.9219};
     return Scaffold(
       appBar: AppBar(
         title: Text('百姓生活+'),
       ),
       body: FutureBuilder(
-          future: getHomePageContent(),
+          future: request('homePageContent', formData),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var jsonData = json.decode(snapshot.data.toString());
@@ -30,6 +41,13 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
               String leaderPhone = data['shopInfo']['leaderPhone'];
               String leaderImage = data['shopInfo']['leaderImage'];
               List<Map> recommendList = (data['recommend'] as List).cast();
+              String floor1Pic = data['floor1Pic']['PICTURE_ADDRESS'];
+              String floor2Pic = data['floor2Pic']['PICTURE_ADDRESS'];
+              String floor3Pic = data['floor3Pic']['PICTURE_ADDRESS'];
+
+              List<Map> floor1List = (data['floor1'] as List).cast();
+              List<Map> floor2List = (data['floor2'] as List).cast();
+              List<Map> floor3List = (data['floor3'] as List).cast();
 
               return SingleChildScrollView(
                 child: Column(
@@ -42,7 +60,14 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                     ),
                     AdBanner(adPicture),
                     LeaderPhone(leaderImage, leaderPhone),
-                    Recommend(recommendList)
+                    Recommend(recommendList),
+                    FloorTitle(floor1Pic),
+                    FloorContent(floor1List),
+                    FloorTitle(floor2Pic),
+                    FloorContent(floor2List),
+                    FloorTitle(floor3Pic),
+                    FloorContent(floor3List),
+                    hotGoods()
                   ],
                 ),
               );
@@ -53,6 +78,80 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
             }
           }),
     );
+  }
+
+  void _fetchHostGoodsList() {
+    var formData = {'page': 1};
+    request('homePageBelowContent', formData).then((val) {
+      var jsonData = json.decode(val.toString());
+      List<Map> newGoodsList = (jsonData['data'] as List).cast();
+      setState(() {
+        hotGoodsList.addAll(newGoodsList);
+        page++;
+      });
+    });
+  }
+
+  Widget hotGoods() => Container(
+        child: Column(
+          children: [hotTile, _wrapList()],
+        ),
+      );
+
+  Widget hotTile = Container(
+    margin: EdgeInsets.only(top: 10),
+    alignment: Alignment.center,
+    color: Colors.transparent,
+    padding: EdgeInsets.all(5),
+    child: Text('火爆专区'),
+  );
+
+  Widget _wrapList() {
+    if (hotGoodsList.isNotEmpty) {
+      List<Widget> listWidget = hotGoodsList.map((e) {
+        return InkWell(
+          child: Container(
+              width: 372.w,
+              color: Colors.white,
+              padding: EdgeInsets.all(5),
+              margin: EdgeInsets.only(bottom: 3),
+              child: Column(
+                children: [
+                  Image.network(
+                    e['image'],
+                    width: 370.w,
+                  ),
+                  Text(
+                    e['name'],
+                    style: TextStyle(color: Colors.pink, fontSize: 24.sp),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "￥${e['mallPrice']}",
+                      ),
+                      Text(
+                        "￥${e['price']}",
+                        style: TextStyle(
+                            color: Colors.black26,
+                            decoration: TextDecoration.lineThrough),
+                      ),
+                    ],
+                  )
+                ],
+              )),
+        );
+      }).toList();
+      return Wrap(
+        spacing: 2,
+        children: listWidget,
+      );
+    } else {
+      return Text('');
+    }
   }
 
   @override
@@ -237,6 +336,66 @@ class Recommend extends StatelessWidget {
           return _item(index);
         },
         scrollDirection: Axis.horizontal,
+      ),
+    );
+  }
+}
+
+class FloorTitle extends StatelessWidget {
+  final String floorPicAddress;
+
+  const FloorTitle(this.floorPicAddress, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Image.network(floorPicAddress),
+    );
+  }
+}
+
+class FloorContent extends StatelessWidget {
+  final List _floorContentList;
+
+  const FloorContent(this._floorContentList, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [_topGoodsRow(), _bottomGoodsColumn()],
+      ),
+    );
+  }
+
+  Widget _topGoodsRow() => Row(
+        children: [
+          _goodItem(_floorContentList[0]),
+          Column(
+            children: [
+              _goodItem(_floorContentList[1]),
+              _goodItem(_floorContentList[2]),
+            ],
+          )
+        ],
+      );
+
+  Widget _bottomGoodsColumn() => Row(
+        children: [
+          _goodItem(_floorContentList[3]),
+          _goodItem(_floorContentList[4]),
+        ],
+      );
+
+  Widget _goodItem(Map goods) {
+    return Container(
+      width: 375.w,
+      child: InkWell(
+        onTap: () {
+          print('楼层商品被点击了');
+        },
+        child: Image.network(goods['image']),
       ),
     );
   }

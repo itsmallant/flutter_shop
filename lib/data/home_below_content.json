@@ -1,0 +1,97 @@
+{
+  "code": "0",
+  "message": "success",
+  "data": [
+    {
+      "name": "国联东海白鲳鱼250g",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20200303112731_7722.jpg",
+      "mallPrice": 8.9,
+      "goodsId": "242d49e85c484c5db05585354a9b3a1c",
+      "price": 9.9
+    },
+    {
+      "name": "深海平鱼约900g",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20200315105458_6428.jpg",
+      "mallPrice": 35.9,
+      "goodsId": "52f7b9e8280e4cc291db1ecaba7bbc64",
+      "price": 39.8
+    },
+    {
+      "name": "即食红极参400g",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20200303114008_221.jpg",
+      "mallPrice": 49.8,
+      "goodsId": "5b967c7984cb48f596b9bddb767efb5f",
+      "price": 68
+    },
+    {
+      "name": "10寸生日蛋糕",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20201014104604_668.jpg",
+      "mallPrice": 138,
+      "goodsId": "badf0099de9a4cf48a3e7df020cb1b83",
+      "price": 168
+    },
+    {
+      "name": "四粒装蛋挞（2盒）",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20201013180849_9326.jpg",
+      "mallPrice": 10,
+      "goodsId": "fe96c9e1c04e4db09b4b110be4c32320",
+      "price": 20
+    },
+    {
+      "name": "原色开心果（约2斤）",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20191126221458_1287.jpg",
+      "mallPrice": 90,
+      "goodsId": "670584f2c4df4a5dbd84985ffe49763d",
+      "price": 110
+    },
+    {
+      "name": "糖糕",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20200309173111_9792.jpg",
+      "mallPrice": 0.9,
+      "goodsId": "38b856b64b644f4b86330cb61ea713b0",
+      "price": 1
+    },
+    {
+      "name": "熟酱牛腱肉（百）约2斤",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20201013154444_5377.jpg",
+      "mallPrice": 113.6,
+      "goodsId": "a8ef48b2ac9d4b968ab38c3c3c649453",
+      "price": 117.6
+    },
+    {
+      "name": "虎皮鸡爪（百）约2斤",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20201014090000_8498.jpg",
+      "mallPrice": 29.6,
+      "goodsId": "b05bd343684b47b6b0afb5fa690ee1e4",
+      "price": 31.6
+    },
+    {
+      "name": "润民黑米馒头",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20201222170432_1462.jpg",
+      "mallPrice": 0.8,
+      "goodsId": "9a42d3ac805f4d0cb44fb8999076a0e6",
+      "price": 1
+    },
+    {
+      "name": "恒丰绿谷赤峰绿豆1kg",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20201009115203_4000.jpg",
+      "mallPrice": 16.9,
+      "goodsId": "73708333685945d59112d96ef4fcd1af",
+      "price": 19.9
+    },
+    {
+      "name": "锐澳鸡尾酒三连包330ml",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20190120095126_4509.jpg",
+      "mallPrice": 20.9,
+      "goodsId": "f7582a874adf438792ca17b8d7fadf0b",
+      "price": 22.99
+    },
+    {
+      "name": "德国莱纳斯黄啤5L",
+      "image": "https://images.baixingliangfan.cn/compressedPic/20210202160238_9756.jpg",
+      "mallPrice": 49,
+      "goodsId": "6e79960cb68e4fb3a6c01c89b11c16cf",
+      "price": 69
+    }
+  ]
+}

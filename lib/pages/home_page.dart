@@ -5,6 +5,7 @@ import 'package:flutter_app/service/service_method.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,12 +18,6 @@ class _HomePageState extends State<HomePage>
   List<Map> hotGoodsList = [];
 
   @override
-  void initState() {
-    _fetchHostGoodsList();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     var formData = {'lon': 116.44355, 'lat': 39.9219};
     return Scaffold(
@@ -30,7 +25,7 @@ class _HomePageState extends State<HomePage>
         title: Text('百姓生活+'),
       ),
       body: FutureBuilder(
-          future: request('homePageContent', formData),
+          future: request('homePageContent', formData:formData),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var jsonData = json.decode(snapshot.data.toString());
@@ -49,8 +44,33 @@ class _HomePageState extends State<HomePage>
               List<Map> floor2List = (data['floor2'] as List).cast();
               List<Map> floor3List = (data['floor3'] as List).cast();
 
-              return SingleChildScrollView(
-                child: Column(
+              return EasyRefresh(
+                footer: ClassicalFooter(
+                  bgColor: Colors.white,
+                  textColor: Colors.pink,
+                    loadText:'loadText',
+                    loadedText: '加载完了',
+                    noMoreText: "灭有更多啦",
+                    loadReadyText:'准备加载',
+                  loadingText: '正在加载。。。',
+                  showInfo: false
+                ),
+                onLoad: () async {
+                  print('EasyRefresh 开始加载更多 page = $page');
+                  var formData = {'page': page};
+                  request('homePageBelowContent', formData:formData).then((val) {
+                    var jsonData = json.decode(val.toString());
+                    var data = jsonData['data'];
+                    if (data != null) {
+                      List<Map> newGoodsList = (data as List).cast();
+                      setState(() {
+                        hotGoodsList.addAll(newGoodsList);
+                        page++;
+                      });
+                    }
+                  });
+                },
+                child: ListView(
                   children: [
                     SwiperDiy(
                       swiperDataList: swiper,
@@ -78,18 +98,6 @@ class _HomePageState extends State<HomePage>
             }
           }),
     );
-  }
-
-  void _fetchHostGoodsList() {
-    var formData = {'page': 1};
-    request('homePageBelowContent', formData).then((val) {
-      var jsonData = json.decode(val.toString());
-      List<Map> newGoodsList = (jsonData['data'] as List).cast();
-      setState(() {
-        hotGoodsList.addAll(newGoodsList);
-        page++;
-      });
-    });
   }
 
   Widget hotGoods() => Container(
@@ -223,6 +231,7 @@ class TopNavigator extends StatelessWidget {
       height: 340.h,
       padding: EdgeInsets.all(3),
       child: GridView.count(
+        physics: NeverScrollableScrollPhysics(),
         crossAxisCount: 5,
         padding: EdgeInsets.all(5),
         children: navigatorList.map((item) {

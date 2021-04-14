@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/provide/category_provide.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
 import './pages/index_page.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => ChildCategory(),
+      )
+    ],
+    child: MyApp(),
+  ));
+}
 
 class MyApp extends StatelessWidget {
   @override

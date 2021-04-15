@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/model/category.dart';
+import 'package:flutter_app/model/category_list_model.dart';
+import 'package:flutter_app/provide/category_list_provide.dart';
 import 'package:flutter_app/provide/category_provide.dart';
 import 'package:flutter_app/service/service_method.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,18 +18,27 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('商品分类'),
-      ),
-      body: Row(
-        children: [
-          LeftCategoryNav(),
-          Column(
-            children: [RightCategoryNav()],
-          )
-        ],
-      ),
-    );
+        appBar: AppBar(
+          title: Text('商品分类'),
+        ),
+        body: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (context) => ChildCategory(),
+            ),
+            ChangeNotifierProvider(
+              create: (context) => CategoryListProvide(),
+            )
+          ],
+          child: Row(
+            children: [
+              LeftCategoryNav(),
+              Column(
+                children: [RightCategoryNav(), CategoryGoodsList()],
+              )
+            ],
+          ),
+        ));
   }
 }
 
@@ -64,10 +75,12 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
   Widget _leftInkWell(int index) {
     return InkWell(
       onTap: () {
+        if (_selectedIndex == index) return;
         setState(() {
           _selectedIndex = index;
         });
         var childList = list[index].bxMallSubDto;
+        _getGoodsList(categoryId: list[_selectedIndex].mallCategoryId);
         Provider.of<ChildCategory>(context, listen: false)
             .setChildCategory(childList);
       },
@@ -75,7 +88,9 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         height: 100.w,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            color: _selectedIndex == index ? Color.fromRGBO(236, 236, 236, 1) : Colors.white,
+            color: _selectedIndex == index
+                ? Color.fromRGBO(236, 236, 236, 1)
+                : Colors.white,
             border:
                 Border(bottom: BorderSide(color: Colors.black12, width: 1))),
         child: Text(list[index].mallCategoryName),
@@ -92,6 +107,17 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
       });
       Provider.of<ChildCategory>(context, listen: false)
           .setChildCategory(list[_selectedIndex].bxMallSubDto);
+      _getGoodsList(categoryId: list[_selectedIndex].mallCategoryId);
+    });
+  }
+
+  void _getGoodsList({String categoryId = '4'}) async {
+    var data = {'categoryId': categoryId, 'categorySubId': '', 'page': 1};
+    await request('getMallGoods', formData: data).then((val) {
+      var decodeData = json.decode(val.toString());
+      var categoryListModel = CategoryListModel.fromJson(decodeData);
+      Provider.of<CategoryListProvide>(context, listen: false)
+          .setCategoryListItems(categoryListModel.data);
     });
   }
 }
@@ -119,21 +145,115 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
               scrollDirection: Axis.horizontal,
               itemCount: childCategory.childCategoryList.length,
               itemBuilder: (context, index) {
-                return _rightInkWell(childCategory.childCategoryList[index]);
+                return _rightInkWell(
+                    childCategory.childCategoryList[index], index);
               });
         }));
   }
 
-  Widget _rightInkWell(BxMallSubDto item) {
+  Widget _rightInkWell(BxMallSubDto item, int index) {
+    bool isSelectedItem =
+        Provider.of<ChildCategory>(context, listen: false).selectedIndex ==
+            index;
     return InkWell(
       onTap: () {
-        print('11');
+        Provider.of<ChildCategory>(context, listen: false)
+            .setSelectedIndex(index);
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 6),
         child: Text(
           item.mallSubName,
-          style: TextStyle(fontSize: 28.sp),
+          style: TextStyle(
+              fontSize: 28.sp,
+              color: isSelectedItem ? Colors.pink : Colors.black),
+        ),
+      ),
+    );
+  }
+}
+
+class CategoryGoodsList extends StatefulWidget {
+  @override
+  _CategoryGoodsListState createState() => _CategoryGoodsListState();
+}
+
+class _CategoryGoodsListState extends State<CategoryGoodsList> {
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        child: Container(
+            width: 570.w,
+            child: Consumer<CategoryListProvide>(
+              builder: (context, value, child) {
+                return ListView.builder(
+                    itemCount: value.categoryListItems.length,
+                    itemBuilder: (context, index) {
+                      return _listItemWidget(value.categoryListItems[index]);
+                    });
+              },
+            )));
+  }
+
+  Widget _goodsImage(CategoryListItem item) {
+    return Container(
+      width: 200.w,
+      height: 200.h,
+      child: Image.network(item.image),
+    );
+  }
+
+  Widget _goodsName(CategoryListItem item) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      width: 370.w,
+      child: Text(
+        item.goodsName,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 28.sp, color: Colors.black87),
+      ),
+    );
+  }
+
+  Widget _goodsPrice(CategoryListItem item) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: 20,
+      ),
+      width: 370.w,
+      child: Row(
+        children: [
+          Text(
+            "价格：￥${item.presentPrice}",
+            style: TextStyle(color: Colors.pink, fontSize: 30.sp),
+          ),
+          Text(
+            "￥${item.oriPrice}",
+            style: TextStyle(
+                decoration: TextDecoration.lineThrough, color: Colors.black26),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _listItemWidget(CategoryListItem item) {
+    return InkWell(
+      onTap: () {},
+      child: Container(
+        padding: EdgeInsets.only(top: 5, bottom: 5),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border:
+                Border(bottom: BorderSide(width: 1, color: Colors.black12))),
+        child: Row(
+          children: [
+            _goodsImage(item),
+            Column(
+              children: [_goodsName(item), _goodsPrice(item)],
+            )
+          ],
         ),
       ),
     );

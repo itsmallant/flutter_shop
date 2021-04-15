@@ -3,4 +3,5 @@ const servicePath = {
   'homePageContent':'${serviceUrl}wxmini/homePageContent',
   'homePageBelowContent':'${serviceUrl}wxmini/homePageBelowConten',
   'getCategory':'${serviceUrl}wxmini/getCategory',//商品类别信息
+  'getMallGoods':'${serviceUrl}wxmini/getMallGoods',//商品类别页面中的商品列表
 };

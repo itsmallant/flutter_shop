@@ -5,12 +5,16 @@ class ChildCategory with ChangeNotifier {
   List<BxMallSubDto> childCategoryList = [];
 
   int selectedIndex = 0;
+  String categoryId = '4';
+  String subId = '';
 
-  setChildCategory(List<BxMallSubDto> list) {
+  setChildCategory(String categoryId, List<BxMallSubDto> list) {
     selectedIndex = 0;
+    this.categoryId = categoryId;
+    subId = '';
     BxMallSubDto bxMallSubDto = BxMallSubDto(
-        mallCategoryId: '00',
-        mallSubId: '00',
+        mallCategoryId: categoryId,
+        mallSubId: '',
         mallSubName: '全部',
         comments: 'null');
     childCategoryList = [bxMallSubDto];
@@ -18,7 +22,8 @@ class ChildCategory with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedIndex(int index) {
+  void setSelectedIndex(String subId, int index) {
+    this.subId = subId;
     selectedIndex = index;
     notifyListeners();
   }

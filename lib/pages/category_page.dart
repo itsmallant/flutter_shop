@@ -80,9 +80,9 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
           _selectedIndex = index;
         });
         var childList = list[index].bxMallSubDto;
-        _getGoodsList(categoryId: list[_selectedIndex].mallCategoryId);
         Provider.of<ChildCategory>(context, listen: false)
-            .setChildCategory(childList);
+            .setChildCategory(list[_selectedIndex].mallCategoryId,childList);
+        _getGoodsList();
       },
       child: Container(
         height: 100.w,
@@ -106,18 +106,18 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         list = categoryModel.data;
       });
       Provider.of<ChildCategory>(context, listen: false)
-          .setChildCategory(list[_selectedIndex].bxMallSubDto);
-      _getGoodsList(categoryId: list[_selectedIndex].mallCategoryId);
+          .setChildCategory(list[_selectedIndex].mallCategoryId,list[_selectedIndex].bxMallSubDto);
+      _getGoodsList();
     });
   }
 
-  void _getGoodsList({String categoryId = '4'}) async {
-    var data = {'categoryId': categoryId, 'categorySubId': '', 'page': 1};
+  void _getGoodsList() async {
+    var data = {'categoryId': Provider.of<ChildCategory>(context,listen: false).categoryId, 'categorySubId': Provider.of<ChildCategory>(context,listen: false).subId, 'page': 1};
     await request('getMallGoods', formData: data).then((val) {
       var decodeData = json.decode(val.toString());
       var categoryListModel = CategoryListModel.fromJson(decodeData);
       Provider.of<CategoryListProvide>(context, listen: false)
-          .setCategoryListItems(categoryListModel.data);
+          .setCategoryListItems(categoryListModel.data == null ?[]:categoryListModel.data);
     });
   }
 }
@@ -140,7 +140,7 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
           border: Border(bottom: BorderSide(width: 1, color: Colors.black26)),
         ),
         child:
-            Consumer<ChildCategory>(builder: (context, childCategory, child) {
+        Consumer<ChildCategory>(builder: (context, childCategory, child) {
           return ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: childCategory.childCategoryList.length,
@@ -153,12 +153,15 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
 
   Widget _rightInkWell(BxMallSubDto item, int index) {
     bool isSelectedItem =
-        Provider.of<ChildCategory>(context, listen: false).selectedIndex ==
+        Provider
+            .of<ChildCategory>(context, listen: false)
+            .selectedIndex ==
             index;
     return InkWell(
       onTap: () {
         Provider.of<ChildCategory>(context, listen: false)
-            .setSelectedIndex(index);
+            .setSelectedIndex(item.mallSubId, index);
+        _getGoodsList();
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 6),
@@ -170,6 +173,21 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
         ),
       ),
     );
+  }
+
+  void _getGoodsList() async {
+    var data = {'categoryId': Provider
+        .of<ChildCategory>(context, listen: false)
+        .categoryId, 'categorySubId': Provider
+        .of<ChildCategory>(context, listen: false)
+        .subId, 'page': 1};
+    await request('getMallGoods', formData: data).then((val) {
+      var decodeData = json.decode(val.toString());
+      var categoryListModel = CategoryListModel.fromJson(decodeData);
+      Provider.of<CategoryListProvide>(context, listen: false)
+          .setCategoryListItems(
+          categoryListModel.data == null ? [] : categoryListModel.data);
+    });
   }
 }
 
@@ -186,11 +204,15 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
             width: 570.w,
             child: Consumer<CategoryListProvide>(
               builder: (context, value, child) {
-                return ListView.builder(
-                    itemCount: value.categoryListItems.length,
-                    itemBuilder: (context, index) {
-                      return _listItemWidget(value.categoryListItems[index]);
-                    });
+                if (value.categoryListItems.length == 0) {
+                  return Text('暂时没有数据');
+                } else {
+                  return ListView.builder(
+                      itemCount: value.categoryListItems.length,
+                      itemBuilder: (context, index) {
+                        return _listItemWidget(value.categoryListItems[index]);
+                      });
+                }
               },
             )));
   }

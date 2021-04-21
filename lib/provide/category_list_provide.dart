@@ -8,4 +8,11 @@ class CategoryListProvide with ChangeNotifier {
     categoryListItems = list;
     notifyListeners();
   }
+
+  addCategoryListItems(List<CategoryListItem> list){
+    categoryListItems.addAll(list);
+    notifyListeners();
+  }
+
+
 }

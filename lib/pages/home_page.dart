@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/routers/application.dart';
+import 'package:flutter_app/routers/routers.dart';
 import 'package:flutter_app/service/service_method.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -118,6 +120,9 @@ class _HomePageState extends State<HomePage>
     if (hotGoodsList.isNotEmpty) {
       List<Widget> listWidget = hotGoodsList.map((e) {
         return InkWell(
+          onTap: (){
+            Application.router.navigateTo(context, '${Routes.GOODS_DETAIL_PAGE}?id=${e['goodsId']}');
+          },
           child: Container(
               width: 372.w,
               color: Colors.white,
@@ -313,7 +318,8 @@ class Recommend extends StatelessWidget {
 
   Widget _item(index) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+      },
       child: Container(
         height: 330.w,
         width: 250.h,

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/routers/application.dart';
 import 'package:flutter_app/routers/routers.dart';
 import 'package:flutter_app/service/service_method.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage>
         title: Text('百姓生活+'),
       ),
       body: FutureBuilder(
-          future: request('homePageContent', formData:formData),
+          future: request('homePageContent', formData: formData),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var jsonData = json.decode(snapshot.data.toString());
@@ -48,19 +48,19 @@ class _HomePageState extends State<HomePage>
 
               return EasyRefresh(
                 footer: ClassicalFooter(
-                  bgColor: Colors.white,
-                  textColor: Colors.pink,
-                    loadText:'loadText',
+                    bgColor: Colors.white,
+                    textColor: Colors.pink,
+                    loadText: 'loadText',
                     loadedText: '加载完了',
                     noMoreText: "灭有更多啦",
-                    loadReadyText:'准备加载',
-                  loadingText: '正在加载。。。',
-                  showInfo: false
-                ),
+                    loadReadyText: '准备加载',
+                    loadingText: '正在加载。。。',
+                    showInfo: false),
                 onLoad: () async {
                   print('EasyRefresh 开始加载更多 page = $page');
                   var formData = {'page': page};
-                  request('homePageBelowContent', formData:formData).then((val) {
+                  request('homePageBelowContent', formData: formData)
+                      .then((val) {
                     var jsonData = json.decode(val.toString());
                     var data = jsonData['data'];
                     if (data != null) {
@@ -120,8 +120,9 @@ class _HomePageState extends State<HomePage>
     if (hotGoodsList.isNotEmpty) {
       List<Widget> listWidget = hotGoodsList.map((e) {
         return InkWell(
-          onTap: (){
-            Application.router.navigateTo(context, '${Routes.GOODS_DETAIL_PAGE}?id=${e['goodsId']}');
+          onTap: () {
+            Application.router.navigateTo(
+                context, '${Routes.GOODS_DETAIL_PAGE}?id=${e['goodsId']}');
           },
           child: Container(
               width: 372.w,
@@ -189,9 +190,15 @@ class SwiperDiy extends StatelessWidget {
       child: Swiper(
         itemCount: swiperDataList.length,
         itemBuilder: (context, index) {
-          return Image.network(
-            '${swiperDataList[index]['image']}',
-            fit: BoxFit.fill,
+          return InkWell(
+            onTap: () {
+              Application.router.navigateTo(context,
+                  '${Routes.GOODS_DETAIL_PAGE}?id=${swiperDataList[index]['goodsId']}');
+            },
+            child: Image.network(
+              '${swiperDataList[index]['image']}',
+              fit: BoxFit.fill,
+            ),
           );
         },
         pagination: SwiperPagination(),
@@ -316,9 +323,11 @@ class Recommend extends StatelessWidget {
     );
   }
 
-  Widget _item(index) {
+  Widget _item(context, index) {
     return InkWell(
       onTap: () {
+        Application.router.navigateTo(context,
+            '${Routes.GOODS_DETAIL_PAGE}?id=${_recommendList[index]['goodsId']}');
       },
       child: Container(
         height: 330.w,
@@ -348,7 +357,7 @@ class Recommend extends StatelessWidget {
       child: ListView.builder(
         itemCount: _recommendList.length,
         itemBuilder: (context, index) {
-          return _item(index);
+          return _item(context, index);
         },
         scrollDirection: Axis.horizontal,
       ),
@@ -379,36 +388,38 @@ class FloorContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        children: [_topGoodsRow(), _bottomGoodsColumn()],
+        children: [_topGoodsRow(context), _bottomGoodsColumn(context)],
       ),
     );
   }
 
-  Widget _topGoodsRow() => Row(
+  Widget _topGoodsRow(context) => Row(
         children: [
-          _goodItem(_floorContentList[0]),
+          _goodItem(context, _floorContentList[0]),
           Column(
             children: [
-              _goodItem(_floorContentList[1]),
-              _goodItem(_floorContentList[2]),
+              _goodItem(context, _floorContentList[1]),
+              _goodItem(context, _floorContentList[2]),
             ],
           )
         ],
       );
 
-  Widget _bottomGoodsColumn() => Row(
+  Widget _bottomGoodsColumn(context) => Row(
         children: [
-          _goodItem(_floorContentList[3]),
-          _goodItem(_floorContentList[4]),
+          _goodItem(context, _floorContentList[3]),
+          _goodItem(context, _floorContentList[4]),
         ],
       );
 
-  Widget _goodItem(Map goods) {
+  Widget _goodItem(context, Map goods) {
     return Container(
       width: 375.w,
       child: InkWell(
         onTap: () {
           print('楼层商品被点击了');
+          Application.router.navigateTo(
+              context, '${Routes.GOODS_DETAIL_PAGE}?id=${goods['goodsId']}');
         },
         child: Image.network(goods['image']),
       ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/pages/goods_detail/goods_detail_explain.dart';
+import 'package:flutter_app/pages/goods_detail/goods_detail_top_area.dart';
 import 'package:flutter_app/provide/goods_detail_provide.dart';
 import 'package:flutter_app/routers/application.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +27,8 @@ class GoodsDetailPage extends StatelessWidget {
           if (snapshot.hasData) {
             return Column(
               children: [
-                Text("goodId:$goodsId")
+                GoodsDetailTopArea(),
+                GoodsDetailExplain()
               ],
             );
           } else {

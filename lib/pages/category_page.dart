@@ -193,8 +193,8 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
                   try {
                     _controller.resetLoadState();
                     _scrollController.jumpTo(0);
-                  } catch (e) {
-                    print('error e = $e');
+                  } catch (e,s) {
+                    //print('error e = $e s = $s');
                   }
                 }
                 if (value.categoryListItems.length == 0) {

@@ -7,9 +7,23 @@ import 'package:flutter_app/service/service_method.dart';
 class GoodsDetailProvide with ChangeNotifier {
   GoodsDetail goodsDetail;
 
-  void fetchGoodsDetailById(String goodsId) {
+  bool isLeft = true;
+  bool isRight = false;
+
+  void changeLeftAndRight(String changeState) {
+    if (changeState == 'left') {
+      isLeft = true;
+      isRight = false;
+    } else {
+      isLeft = false;
+      isRight = true;
+    }
+    notifyListeners();
+  }
+
+  Future fetchGoodsDetailById(String goodsId) {
     var fromData = {'goodId': goodsId};
-    request('getGoodDetailById', formData: fromData).then((val) {
+    return request('getGoodDetailById', formData: fromData).then((val) {
       var responseData = json.decode(val);
       goodsDetail = GoodsDetail.fromJson(responseData);
       notifyListeners();

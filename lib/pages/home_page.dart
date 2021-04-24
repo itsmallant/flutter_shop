@@ -303,7 +303,7 @@ class Recommend extends StatelessWidget {
     return Container(
       height: 380.h,
       margin: EdgeInsets.only(top: 10),
-      child: Column(
+      child: ListView(
         children: [_titleWidget(), _recommendListView()],
       ),
     );

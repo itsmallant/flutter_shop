@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/pages/goods_detail/goods_detail_bottom.dart';
 import 'package:flutter_app/pages/goods_detail/goods_detail_explain.dart';
+import 'package:flutter_app/pages/goods_detail/goods_detail_tabbar.dart';
 import 'package:flutter_app/pages/goods_detail/goods_detail_top_area.dart';
+import 'package:flutter_app/pages/goods_detail/goods_detail_web.dart';
 import 'package:flutter_app/provide/goods_detail_provide.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_app/routers/application.dart';
 import 'package:provider/provider.dart';
 
@@ -25,10 +29,24 @@ class GoodsDetailPage extends StatelessWidget {
         future: getGoodsDetailData(context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return Column(
+            return Stack(
               children: [
-                GoodsDetailTopArea(),
-                GoodsDetailExplain()
+                Container(
+                  margin: EdgeInsets.only(bottom: 80.h),
+                  child: ListView(
+                    children: [
+                      GoodsDetailTopArea(),
+                      GoodsDetailExplain(),
+                      GoodsDetailTabBar(),
+                      GoodsDetailWeb()
+                    ],
+                  ),
+                ),
+                Positioned(
+                  child: GoodsDetailBottom(),
+                  bottom: 0,
+                  left: 0,
+                )
               ],
             );
           } else {
@@ -40,7 +58,7 @@ class GoodsDetailPage extends StatelessWidget {
   }
 
   Future getGoodsDetailData(context) async {
-    Provider.of<GoodsDetailProvide>(context, listen: false)
+    await Provider.of<GoodsDetailProvide>(context, listen: false)
         .fetchGoodsDetailById(goodsId);
     return "加载完成";
   }

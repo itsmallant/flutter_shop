@@ -1,5 +1,6 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/provide/cart_provider.dart';
 import 'package:flutter_app/provide/goods_detail_provide.dart';
 import 'package:flutter_app/routers/application.dart';
 import 'package:flutter_app/routers/routers.dart';
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
               providers: [
                 ChangeNotifierProvider(create: (context) {
                   return GoodsDetailProvide();
+                }),
+                ChangeNotifierProvider(create: (context){
+                  return CartProvider();
                 })
               ],
               child: _createAppWidget(),
